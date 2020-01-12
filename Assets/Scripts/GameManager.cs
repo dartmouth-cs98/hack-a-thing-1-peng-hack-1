@@ -21,8 +21,8 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (ball.hasHitCup && ball.hasHitTable) {
-            resetServe();
+        if (ball.hasSunk || (ball.hasHitCup && ball.hasHitTable)) {
+            StartCoroutine(resetServe());
         }
     }
 
@@ -32,8 +32,42 @@ public class GameManager : MonoBehaviour
         shrub2.spawn();
     }
 
-    void resetServe()
+    public IEnumerator resetServe()
     {
+        if (!ball.isBeingReset)
+        {
+            Debug.Log("resetting serve");
+            ball.isBeingReset = true;
+            yield return new WaitForSeconds(3);
 
+            ball.gameObject.transform.position = ball.startingPosition;
+            ball.GetComponent<Rigidbody>().gameObject.SetActive(true);
+            ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+            ball.hasHitCup = false;
+            ball.hasHitTable = false;
+            ball.hasSunk = false;
+
+            ball.isBeingReset = false;
+        }
+
+
+    }
+
+    public IEnumerator removeCup(string id, float remainingLiquid) 
+    {
+        yield return new WaitForSeconds(1);
+        Debug.Log("remove Cup " + id + " " + shrub2.idToCup.ContainsKey(id));
+        if (shrub1.idToCup.ContainsKey(id))
+        {
+            Destroy(shrub1.idToCup[id], 3);
+            shrub1.idToCup[id].gameObject.SetActive(false);
+            player1Score -= remainingLiquid;
+        } else if (shrub2.idToCup.ContainsKey(id)) 
+        {
+            Destroy(shrub2.idToCup[id], 3);
+            shrub2.idToCup[id].gameObject.SetActive(false);
+            player2Score -= remainingLiquid;
+        }
     }
 }

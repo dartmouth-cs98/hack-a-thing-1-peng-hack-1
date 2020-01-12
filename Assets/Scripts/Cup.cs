@@ -5,13 +5,16 @@ using UnityEngine;
 public class Cup : MonoBehaviour
 {
 
-    GameObject sinkTarget;
-    int cupNumber;
-    float remainingLiquid = 1;
+    public Sink sinkTarget;
+    public string cupId;
+    public float remainingLiquid = 1.0f;
+    public GameManager gameManager;
+    public bool isSunk;
 
-    public Cup (int id)
+    public Cup (string id, GameManager gameManager)
     {
-        this.cupNumber = id;
+        this.cupId = id;
+        this.gameManager = gameManager;
     }
 
     // Start is called before the first frame update
@@ -27,14 +30,29 @@ public class Cup : MonoBehaviour
     }
 
     void hit() {
+        gameManager.ball.hasHitCup = true;
         remainingLiquid -= 0.5f;
+        if (remainingLiquid <= 0) {
+            StartCoroutine(gameManager.removeCup(cupId, 0.5f));
+        }
     }
 
-    void sink() {
+    public void sink() {
+        StartCoroutine(gameManager.removeCup(cupId, remainingLiquid));
         remainingLiquid = 0;
     }
 
-    void OnCollisionEnter() {
-        hit();
+    void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.transform.CompareTag("ball") && !gameManager.ball.hasHitCup) {
+            Debug.Log("Hit cup " + cupId + " remaining liquid: " + remainingLiquid);
+
+            if (isSunk) {
+                sink();
+            }
+
+            if (!gameManager.ball.hasSunk && !gameManager.ball.hasHitCup) {
+                hit();
+            }
+        }
     }
 }

@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-    GameManager gameManager;
-    Vector3 startingPosition;
+    public GameManager gameManager;
+    public Vector3 startingPosition;
     public bool hasHitTable = false;
     public bool hasHitCup = false;
+    public bool hasSunk = false;
+    public bool isBeingReset = false;
     public GameObject hitCup;
 
 
@@ -20,6 +22,11 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // if Ball stops moving or if ball falls through floor.
+        if (Vector3.Magnitude(transform.GetComponent<Rigidbody>().velocity) <= 1 ||
+            transform.position.y < 0){
+            StartCoroutine(gameManager.resetServe());
+        }
         
     }
 
@@ -27,16 +34,25 @@ public class Ball : MonoBehaviour
     {
         if (collision.transform.CompareTag("floor"))
         {
-            transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            transform.position = startingPosition;
+            StartCoroutine(gameManager.resetServe());
         } else if (collision.transform.CompareTag("table"))
         {
-            hasHitTable = true;
-            transform.GetComponent<Rigidbody>().velocity = transform.GetComponent<Rigidbody>().velocity + new Vector3(0, 1f, 0);
+            // reset if second bounce on table;
+            if (hasHitTable) {
+                StartCoroutine(gameManager.resetServe());
+            } else {
+                 // add bounciness if it hit the table
+                hasHitTable = true;
+                transform.GetComponent<Rigidbody>().velocity = transform.GetComponent<Rigidbody>().velocity + new Vector3(0, 1f, 0);
+            }
         } else if (collision.transform.CompareTag("cup")) 
         {
             hitCup = collision.gameObject;
             hasHitCup = true;
+        } else if (collision.transform.CompareTag("sink"))
+        {
+            hasSunk = true;
+            hitCup = collision.gameObject;
         }
     }
 }

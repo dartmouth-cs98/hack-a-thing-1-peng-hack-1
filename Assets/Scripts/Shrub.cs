@@ -7,6 +7,10 @@ public class Shrub : MonoBehaviour
     Cup[] cups;
     public GameObject[] placeHolders;
     public GameObject cup;
+    public Dictionary<string, Cup> idToCup = new Dictionary<string, Cup>();
+    public int shrubNumber;
+    
+    public GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
@@ -23,9 +27,17 @@ public class Shrub : MonoBehaviour
     public void spawn()
     {
         for (int i = 0; i < placeHolders.Length; i++) {
-            Instantiate(cup, placeHolders[i].gameObject.transform.position, Quaternion.identity);
-            placeHolders[i].SetActive(false);
+            GameObject clone = Instantiate(cup, placeHolders[i].gameObject.transform.position, Quaternion.identity);
+            Cup newCup = clone.GetComponent<Cup>();
 
+            string id = shrubNumber + "-" + i;
+            newCup.cupId = id;
+            newCup.remainingLiquid = 1.0f;
+            newCup.gameManager = gameManager;
+            newCup.sinkTarget.gameManager = gameManager;
+
+            idToCup.Add(id, newCup);
+            placeHolders[i].SetActive(false);
         }
     }
 }

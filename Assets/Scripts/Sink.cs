@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Sink : MonoBehaviour
 {
+    public Cup cup;
+    public GameManager gameManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,10 +20,14 @@ public class Sink : MonoBehaviour
 
     void OnTriggerEnter(Collider collider) 
     {
-        Debug.Log("here");
         if (collider.CompareTag("ball")) {
+            Debug.Log("Sink Cup");
             collider.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            collider.transform.position = collider.transform.position + new Vector3(0,-0.001f, 0);
+            collider.GetComponent<Rigidbody>().gameObject.SetActive(false);
+            cup.isSunk = true;
+            gameManager.ball.hasSunk = true;
+
+            cup.sink();
         }
     }
 }

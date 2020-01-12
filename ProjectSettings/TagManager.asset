@@ -8,6 +8,7 @@ TagManager:
   - table
   - floor
   - cup
+  - sink
   layers:
   - Default
   - TransparentFX
