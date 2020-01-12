@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bot.cs : MonoBehaviour
+public class Bot : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
