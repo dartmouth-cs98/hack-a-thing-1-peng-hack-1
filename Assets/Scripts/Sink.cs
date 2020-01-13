@@ -26,6 +26,7 @@ public class Sink : MonoBehaviour
             collider.GetComponent<Rigidbody>().gameObject.SetActive(false);
             cup.isSunk = true;
             gameManager.ball.hasSunk = true;
+            gameManager.ball.lastHitter = gameManager.ball.lastHitter == PlayerName.One ? PlayerName.Two : PlayerName.One;
 
             cup.sink();
         }

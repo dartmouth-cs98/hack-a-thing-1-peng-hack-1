@@ -26,15 +26,18 @@ public class Cup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (remainingLiquid <= 0) {
+            StartCoroutine(gameManager.removeCup(cupId, 0.5f));
+        }
     }
 
     void hit() {
         gameManager.ball.hasHitCup = true;
-        remainingLiquid -= 0.5f;
-        if (remainingLiquid <= 0) {
-            StartCoroutine(gameManager.removeCup(cupId, 0.5f));
-        }
+        gameManager.ball.hitCup = this;
+        // remainingLiquid -= 0.5f;
+        // if (remainingLiquid <= 0) {
+        //     StartCoroutine(gameManager.removeCup(cupId, 0.5f));
+        // }
     }
 
     public void sink() {

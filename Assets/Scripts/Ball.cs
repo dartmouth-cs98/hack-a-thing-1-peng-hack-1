@@ -9,8 +9,12 @@ public class Ball : MonoBehaviour
     public bool hasHitTable = false;
     public bool hasHitCup = false;
     public bool hasSunk = false;
+    public bool hasHitFloor = false;
     public bool isBeingReset = false;
-    public GameObject hitCup;
+    public Cup hitCup;
+    public PlayerName lastHitter;
+    public int numBounces = 0;
+    public int rallyLength = 0;
 
 
     // Start is called before the first frame update
@@ -22,37 +26,65 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // if Ball stops moving or if ball falls through floor.
-        if (Vector3.Magnitude(transform.GetComponent<Rigidbody>().velocity) <= 1 ||
-            transform.position.y < 0){
-            StartCoroutine(gameManager.resetServe());
+        if (hasHitCup && !isLiveBall()) {
+            lastHitter = lastHitter == PlayerName.One ? PlayerName.One : PlayerName.Two;
         }
-        
+    }
+
+    public bool isLiveBall()
+    {
+        if (hasSunk || hasHitFloor || isBeingReset || numBounces >= 2) {
+            return false;
+        }
+        return true;
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.CompareTag("floor"))
         {
+            
+            if (hasHitCup) {
+                hitCup.remainingLiquid -= 0.5f;
+            }
+
+            Debug.Log("reset because off table");
+            if (numBounces == 1 && isLiveBall()) {  // If a player whiffs the shot, they have to serve. 
+                lastHitter = lastHitter == PlayerName.One ? PlayerName.Two : PlayerName.One;
+            }
+            hasHitFloor = true;
             StartCoroutine(gameManager.resetServe());
         } else if (collision.transform.CompareTag("table"))
         {
+            numBounces += 1;
             // reset if second bounce on table;
-            if (hasHitTable) {
+            if (numBounces >= 2) {
+
+                if (hasHitCup) {
+                    hitCup.remainingLiquid -= 0.5f;
+                }
+
+                Debug.Log("Reset second bounce");
                 StartCoroutine(gameManager.resetServe());
             } else {
-                 // add bounciness if it hit the table
+                 // add bounciness if hit the table
                 hasHitTable = true;
-                transform.GetComponent<Rigidbody>().velocity = transform.GetComponent<Rigidbody>().velocity + new Vector3(0, 1f, 0);
+                hasHitCup = false;
+                transform.GetComponent<Rigidbody>().velocity = transform.GetComponent<Rigidbody>().velocity + new Vector3(0, 1.25f, 0);
             }
         } else if (collision.transform.CompareTag("cup")) 
         {
-            hitCup = collision.gameObject;
-            hasHitCup = true;
+            if (rallyLength >= 1) {      // can't serve at cup
+                Debug.Log("here");
+                hasHitCup = true;
+                hitCup = collision.gameObject.GetComponent<Cup>();
+            }
         } else if (collision.transform.CompareTag("sink"))
         {
-            hasSunk = true;
-            hitCup = collision.gameObject;
+            if (rallyLength >= 1) {      // Can't serve at cup
+                hasSunk = true;
+                hitCup = collision.gameObject.GetComponent<Cup>();
+            }
         }
     }
 }

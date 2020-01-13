@@ -15,6 +15,8 @@ public class Player : MonoBehaviour
     float BIAS_SHIFT_RATE = 0.15f;
     float INITIAL_SIZE;
     Animator animator;
+    public GameManager gameManager;
+    public PlayerName playerName;
 
 
     // Start is called before the first frame update
@@ -63,9 +65,19 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter(Collider collision) 
     {
         if (collision.CompareTag("ball")) {
+            gameManager.ball.rallyLength += 1;
+            gameManager.ball.lastHitter = playerName;
+            gameManager.ball.numBounces = 0;
             Vector3 angle = bias.position - paddle.transform.position + new Vector3(Random.Range(-variance, variance), 0, Random.Range(-variance, variance));
-            collision.GetComponent<Rigidbody>().velocity = angle.normalized * power  + new Vector3(0, 4, 0);
+            collision.GetComponent<Rigidbody>().velocity = angle.normalized * power  + new Vector3(0, 3.5f, 0);
+            collision.GetComponent<Rigidbody>().useGravity = true;
             animator.Play("Swing");
         }
     }
+}
+
+public enum PlayerName
+{
+    One,
+    Two
 }

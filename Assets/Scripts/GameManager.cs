@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 
     float player1Score = 7;
     float player2Score = 7;
+
+    public Transform player1ServeLocation;
+    public Transform player2ServeLocation;
     public Ball ball;
     public Shrub shrub1;
     public Shrub shrub2;
@@ -21,9 +24,12 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (ball.hasSunk || (ball.hasHitCup && ball.hasHitTable)) {
-            StartCoroutine(resetServe());
+        if (player1Score > 0 && player2Score > 0) {
+            if (ball.hasSunk || (ball.hasHitCup && ball.hasHitTable)) {
+                StartCoroutine(resetServe());
+            }
         }
+
     }
 
     void spawnCups() 
@@ -38,21 +44,36 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("resetting serve");
             ball.isBeingReset = true;
+
             yield return new WaitForSeconds(3);
 
-            ball.gameObject.transform.position = ball.startingPosition;
+            ball.gameObject.transform.position = isPlayerOneServe() ? player1ServeLocation.position : player2ServeLocation.position;
             ball.GetComponent<Rigidbody>().gameObject.SetActive(true);
             ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            ball.GetComponent<Rigidbody>().useGravity = false;
 
             ball.hasHitCup = false;
             ball.hasHitTable = false;
             ball.hasSunk = false;
+            ball.hasHitFloor = false;
+            ball.rallyLength = 0;
+            ball.numBounces = 0;
+            ball.hitCup = null;
 
             ball.isBeingReset = false;
         }
-
-
     }
+
+    bool isPlayerOneServe()
+    {
+        Debug.Log(ball.hitCup);
+        if (ball.hitCup != null) {
+            // if resetting because of a cup that was hit, the person's cup who was hit serves.
+            return shrub1.idToCup.ContainsKey(ball.hitCup.cupId);
+        }
+        return ball.lastHitter == PlayerName.One;
+    }
+
 
     public IEnumerator removeCup(string id, float remainingLiquid) 
     {
