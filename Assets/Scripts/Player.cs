@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class that controls the behavior of the human player
+/// </summary>
 public class Player : MonoBehaviour
 {
     public Transform bias;
@@ -65,9 +68,15 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter(Collider collision) 
     {
         if (collision.CompareTag("ball")) {
+
+            if (gameManager.ball.isLiveBall()) {
+                gameManager.ball.lastHitter = playerName;
+            }
+
             gameManager.ball.rallyLength += 1;
-            gameManager.ball.lastHitter = playerName;
             gameManager.ball.numBounces = 0;
+
+            // calculate direction and add noise to aim according to bias and variance
             Vector3 angle = bias.position - paddle.transform.position + new Vector3(Random.Range(-variance, variance), 0, Random.Range(-variance, variance));
             collision.GetComponent<Rigidbody>().velocity = angle.normalized * power  + new Vector3(0, 3.5f, 0);
             collision.GetComponent<Rigidbody>().useGravity = true;

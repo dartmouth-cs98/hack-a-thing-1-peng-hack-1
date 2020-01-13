@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
     float player1Score = 7;
     float player2Score = 7;
-
     public Transform player1ServeLocation;
     public Transform player2ServeLocation;
     public Ball ball;
@@ -21,17 +19,6 @@ public class GameManager : MonoBehaviour
         spawnCups();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (player1Score > 0 && player2Score > 0) {
-            if (ball.hasSunk || (ball.hasHitCup && ball.hasHitTable)) {
-                StartCoroutine(resetServe());
-            }
-        }
-
-    }
-
     void spawnCups() 
     {
         shrub1.spawn();
@@ -40,18 +27,20 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator resetServe()
     {
-        if (!ball.isBeingReset)
+        if (!ball.isBeingReset) // prevent other reset attempts while resetting.
         {
             Debug.Log("resetting serve");
             ball.isBeingReset = true;
 
             yield return new WaitForSeconds(3);
 
+            // move to correct spawning location
             ball.gameObject.transform.position = isPlayerOneServe() ? player1ServeLocation.position : player2ServeLocation.position;
             ball.GetComponent<Rigidbody>().gameObject.SetActive(true);
             ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
             ball.GetComponent<Rigidbody>().useGravity = false;
 
+            // reset fields of ball;
             ball.hasHitCup = false;
             ball.hasHitTable = false;
             ball.hasSunk = false;
@@ -64,9 +53,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// determines who should serve
+    /// Person who last hit the ball should serve
+    /// unless the other person whiffs or hits a cup
+    /// </summary>
     bool isPlayerOneServe()
     {
-        Debug.Log(ball.hitCup);
         if (ball.hitCup != null) {
             // if resetting because of a cup that was hit, the person's cup who was hit serves.
             return shrub1.idToCup.ContainsKey(ball.hitCup.cupId);

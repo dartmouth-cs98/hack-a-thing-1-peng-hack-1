@@ -17,12 +17,6 @@ public class Cup : MonoBehaviour
         this.gameManager = gameManager;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -32,15 +26,13 @@ public class Cup : MonoBehaviour
     }
 
     void hit() {
+        // mark that cup has been hit. There's still a chance that ball will be saved. 
         gameManager.ball.hasHitCup = true;
         gameManager.ball.hitCup = this;
-        // remainingLiquid -= 0.5f;
-        // if (remainingLiquid <= 0) {
-        //     StartCoroutine(gameManager.removeCup(cupId, 0.5f));
-        // }
     }
 
     public void sink() {
+        // a sink is a sink
         StartCoroutine(gameManager.removeCup(cupId, remainingLiquid));
         remainingLiquid = 0;
     }

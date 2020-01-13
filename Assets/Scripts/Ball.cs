@@ -5,7 +5,6 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     public GameManager gameManager;
-    public Vector3 startingPosition;
     public bool hasHitTable = false;
     public bool hasHitCup = false;
     public bool hasSunk = false;
@@ -16,12 +15,6 @@ public class Ball : MonoBehaviour
     public int numBounces = 0;
     public int rallyLength = 0;
 
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        startingPosition = transform.position;
-    }
 
     // Update is called once per frame
     void Update()
@@ -43,18 +36,20 @@ public class Ball : MonoBehaviour
     {
         if (collision.transform.CompareTag("floor"))
         {
-            
-            if (hasHitCup) {
+            if (hasHitCup) 
+            {   // if player failed to save, reduce liquid.
                 hitCup.remainingLiquid -= 0.5f;
             }
 
-            Debug.Log("reset because off table");
-            if (numBounces == 1 && isLiveBall()) {  // If a player whiffs the shot, they have to serve. 
+            if (numBounces == 1 && isLiveBall()) 
+            {   // If a player whiffs the shot, they have to serve. 
                 lastHitter = lastHitter == PlayerName.One ? PlayerName.Two : PlayerName.One;
             }
+
             hasHitFloor = true;
             StartCoroutine(gameManager.resetServe());
-        } else if (collision.transform.CompareTag("table"))
+        } 
+        else if (collision.transform.CompareTag("table"))
         {
             numBounces += 1;
             // reset if second bounce on table;
@@ -63,7 +58,6 @@ public class Ball : MonoBehaviour
                 if (hasHitCup) {
                     hitCup.remainingLiquid -= 0.5f;
                 }
-
                 Debug.Log("Reset second bounce");
                 StartCoroutine(gameManager.resetServe());
             } else {
@@ -72,14 +66,15 @@ public class Ball : MonoBehaviour
                 hasHitCup = false;
                 transform.GetComponent<Rigidbody>().velocity = transform.GetComponent<Rigidbody>().velocity + new Vector3(0, 1.25f, 0);
             }
-        } else if (collision.transform.CompareTag("cup")) 
+        } 
+        else if (collision.transform.CompareTag("cup")) 
         {
             if (rallyLength >= 1) {      // can't serve at cup
-                Debug.Log("here");
                 hasHitCup = true;
                 hitCup = collision.gameObject.GetComponent<Cup>();
             }
-        } else if (collision.transform.CompareTag("sink"))
+        } 
+        else if (collision.transform.CompareTag("sink"))
         {
             if (rallyLength >= 1) {      // Can't serve at cup
                 hasSunk = true;

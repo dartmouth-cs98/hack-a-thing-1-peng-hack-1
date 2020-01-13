@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class responsible for spawning and keeping track of the active/inactive cups
+/// </summary>
 public class Shrub : MonoBehaviour
 {
     Cup[] cups;
@@ -9,21 +12,17 @@ public class Shrub : MonoBehaviour
     public GameObject cup;
     public Dictionary<string, Cup> idToCup = new Dictionary<string, Cup>();
     public int shrubNumber;
-    
     public GameManager gameManager;
 
-    // Start is called before the first frame update
     void Start()
     {
         cups = new Cup[placeHolders.Length];
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    /// <summary>
+    /// Spawns cups and replaces placeholders.
+    /// stores id's to cups in a dictionary;
+    /// </summary>
     public void spawn()
     {
         for (int i = 0; i < placeHolders.Length; i++) {
